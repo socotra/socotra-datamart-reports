@@ -7,3 +7,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 .venv/
+dist/
+build/
+.coverage
+.tox/
+.pytest_cache/
+*.egg
+*.egg-info/

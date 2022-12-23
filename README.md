@@ -1,27 +1,27 @@
 # Data Mart Reporting
 
-A collection of sample queries and ready-to-run scripts for common Data Mart reporting needs.
-
-## Sample Queries
-
-The `sample_queries` directory features a selection of basic queries to help you familiarize yourself with Data Mart.
+A library for common [Data Mart](https://docs.socotra.com/production/data/datamartguide.html) reporting needs.
 
 ## Reports
 
-`reports` features a set of reports that can be run against a Data Mart instance. 
-Those reports prefaced with `platform_` have analogues in the Socotra platform.
+Reports prefaced with `platform_` have [analogues in the Socotra platform](https://docs.socotra.com/production/data/reporting.html).
 
-### Running a demo
+You can run reports by passing database credentials to the report class instance, then calling the appropriate execution method.
 
-Initialize a virtual environment, install dependencies (`requirements.txt`), set your credentials in a `.env` 
-file (root dir, as a peer of `main.py`) with the following contents:
+Example:
 
+```python
+from socotra_datamart_reports import TransactionFinancialImpactReport
+
+creds = {
+    'user': 'my-datamart-username',
+    'password': 'my-datamart-password',
+    'port': 'my-datamart-port',
+    'host': 'my-datamart-host',
+    'database': 'my-datamart-database'
+}
+
+tfir = TransactionFinancialImpactReport(creds)
+tfir.write_transaction_financial_impact_report(
+    'personal-auto', 1659326400000, 1664596800000, 'tx_report.csv')
 ```
-REPORT_USER="your_datamart_username"
-REPORT_PASSWORD="your_datamart_password"
-REPORT_HOST="your_datamart_host"
-REPORT_PORT="your_datamart_port"
-REPORT_DATABASE="your_datamart_database"
-```
-
-and then run `main.py`

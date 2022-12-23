@@ -8,7 +8,8 @@ def entry_belongs_to_group_field(entry):
 
 def get_flattened_fields(prefix: str, collection):
     """
-    Returns ordered lists of dicts of flattened fields for a collection of aggregated field data
+    Returns ordered lists of dicts of flattened fields for a collection
+    of aggregated field data
     :param prefix: optional string to precede final column name for the field
     :param collection: a list of rows of JSON-aggregated field values
     :return: list of lists of flattened values
@@ -24,15 +25,18 @@ def get_flattened_fields(prefix: str, collection):
 
     # Part I: Survey fields across all rows
     for entry_collection in collection:
-        single_fields = [entry for entry in entry_collection if not entry_belongs_to_group_field(entry)]
-        group_fields = [entry for entry in entry_collection if entry_belongs_to_group_field(entry)]
+        single_fields = [entry for entry in entry_collection
+                         if not entry_belongs_to_group_field(entry)]
+        group_fields = [entry for entry in entry_collection
+                        if entry_belongs_to_group_field(entry)]
 
         single_entry_map = {}
         for field in single_fields:
             field_name = field['field_name']
             if single_entry_map.get(field_name) is None:
                 single_entry_map[field_name] = set()
-            single_entry_map[field_name].add((field['id'], field['field_value']))
+            single_entry_map[field_name].add(
+                (field['id'], field['field_value']))
 
         all_single_entry_maps.append(single_entry_map)
 
@@ -48,8 +52,8 @@ def get_flattened_fields(prefix: str, collection):
         #    }, ...
         # }
         #
-        # In this way, we account for the possibility that a given field is repeatable
-        # within the field group itself.
+        # In this way, we account for the possibility that a given field is
+        # repeatable within the field group itself.
         group_entry_map = {}
         for field in group_fields:
             parent_field_name = field['parent_name']
@@ -60,9 +64,11 @@ def get_flattened_fields(prefix: str, collection):
             group_entry_map_key = group_entry_map.get(parent_field_name)
             if group_entry_map_key is None:
                 group_entry_map[parent_field_name] = {}
-            if group_entry_map.get(parent_field_name).get(parent_field_locator) is None:
+            if group_entry_map.get(parent_field_name).get(
+                    parent_field_locator) is None:
                 group_entry_map[parent_field_name][parent_field_locator] = {}
-            if group_entry_map[parent_field_name][parent_field_locator].get(field_name) is None:
+            if group_entry_map[parent_field_name][parent_field_locator].get(
+                    field_name) is None:
                 group_entry_map[parent_field_name][parent_field_locator][field_name] = []
             group_entry_map[parent_field_name][parent_field_locator][field_name].append((field_id, field_value))
 
@@ -135,11 +141,11 @@ def get_flattened_results(results):
     # get results for policy_fields, exposure_fields, peril_fields
     all_fields = {'policy': [], 'exposure': [], 'peril': []}
     for row in results:
-        if row['policy_fields'] is not None:
+        if row.get('policy_fields') is not None:
             all_fields['policy'].append(json.loads(row['policy_fields']))
-        if row['exposure_fields'] is not None:
+        if row.get('exposure_fields') is not None:
             all_fields['exposure'].append(json.loads(row['exposure_fields']))
-        if row['peril_fields'] is not None:
+        if row.get('peril_fields') is not None:
             all_fields['peril'].append(json.loads(row['peril_fields']))
 
     flattened_exposure_fields = get_flattened_fields('Exposure', all_fields['exposure'])
