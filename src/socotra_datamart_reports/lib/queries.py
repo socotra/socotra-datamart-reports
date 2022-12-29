@@ -163,6 +163,7 @@ def get_financial_transactions_query(start_timestamp: int, end_timestamp: int):
               policy.currency,
               ft.posted_timestamp,
               ft.type,
+              ft.invoice_locator AS invoice_locator,
               policy.locator AS policy_locator,
               policy.product_name AS product_name,
               ft.peril_characteristics_locator,

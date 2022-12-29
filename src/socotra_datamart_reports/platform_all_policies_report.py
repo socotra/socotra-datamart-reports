@@ -46,8 +46,8 @@ class AllPoliciesReport(BaseReport):
                 product_name, start_timestamp, end_timestamp))
 
     def write_all_policies_report(
-            self, product_name: str, start_timestamp: str,
-            end_timestamp: str, report_file_path):
+            self, product_name: str, start_timestamp: int,
+            end_timestamp: int, report_file_path: str):
         """
         Writes an all-policies report set, including flattened field values,
         to specified file path (CSV)

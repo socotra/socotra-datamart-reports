@@ -1,5 +1,6 @@
 import socotra_datamart_reports.lib.get_flattened_fields as gff
 
+
 def test_distinguishes_entries_belonging_to_group_field():
     non_group_entry = {
         'parent_locator': '',
@@ -25,11 +26,13 @@ def test_distinguishes_entries_belonging_to_group_field():
         'id': 123456
     }
 
-    assert gff.entry_belongs_to_group_field(non_group_entry) == False
-    assert gff.entry_belongs_to_group_field(group_entry) == True
+    assert gff.entry_belongs_to_group_field(non_group_entry) is False
+    assert gff.entry_belongs_to_group_field(group_entry) is True
+
 
 def test_get_flattened_fields_empty_list_returns_empty_list():
     assert gff.get_flattened_fields('Prefix', []) == []
+
 
 def test_get_flattened_fields_returns_expected_result():
     sample_collection = [[
