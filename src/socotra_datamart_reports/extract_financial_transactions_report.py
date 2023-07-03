@@ -1,4 +1,4 @@
-from socotra_datamart_reports.lib import queries_platform as queries
+from socotra_datamart_reports.lib import queries_extract as queries
 from socotra_datamart_reports.lib.base_report import \
     BaseReport, write_report_results
 
@@ -9,8 +9,21 @@ class FinancialTransactionsReport(BaseReport):
     """
     def __init__(self, creds):
         super().__init__(creds)
+        self.name = "financial_transactions"
+        self.argument_specs = [
+            {
+                "name": "start_timestamp",
+                "required": False,
+                "default": False
+            },
+            {
+                "name": "end_timestamp",
+                "required": True,
+                "default": True                
+            }
+        ]
 
-    def get_financial_transactions_report(
+    def get(
             self, start_timestamp: int, end_timestamp: int):
         """
         Returns financial transaction report results, one dict per row
@@ -26,7 +39,7 @@ class FinancialTransactionsReport(BaseReport):
 
         return self.fetch_all_results_for_query(query)
 
-    def write_financial_transactions_report(
+    def write(
             self, start_timestamp: int, end_timestamp: int,
             report_file_path: str):
         """
@@ -38,6 +51,6 @@ class FinancialTransactionsReport(BaseReport):
                 results
         :return:
         """
-        results = self.get_financial_transactions_report(
+        results = self.get(
             start_timestamp, end_timestamp)
         write_report_results(results, report_file_path)

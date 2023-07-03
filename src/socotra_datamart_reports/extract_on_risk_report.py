@@ -15,8 +15,20 @@ class OnRiskReport(BaseReport):
 
     def __init__(self, creds):
         super().__init__(creds)
+        self.argument_specs = [
+            {
+                "name": "product_name",
+                "required": False,
+                "default": False
+            },
+            {
+                "name": "as_of_timestamp",
+                "required": True,
+                "default": True                
+            }
+        ]
 
-    def fetch_on_risk_data(self, product_name: str, as_of_timestamp: int):
+    def fetch(self, product_name: str, as_of_timestamp: int):
         """
         Fetches raw on-risk data, with field values aggregated into JSON at
         each of the peril, exposure, policy levels
@@ -27,7 +39,7 @@ class OnRiskReport(BaseReport):
         query = queries.get_on_risk_query(product_name, as_of_timestamp)
         return self.fetch_all_results_for_query(query)
 
-    def get_on_risk_report_with_flattened_fields(
+    def get(
             self, product_name: str, as_of_timestamp: int):
         """
         Returns result set with field values "flattened", i.e., made into
@@ -40,7 +52,7 @@ class OnRiskReport(BaseReport):
         return get_flattened_fields.get_flattened_results(
             self.fetch_on_risk_data(product_name, as_of_timestamp))
 
-    def write_on_risk_report(self, product_name: str, as_of_timestamp: int,
+    def write(self, product_name: str, as_of_timestamp: int,
                              report_file_path: str):
         """
         Writes an on-risk report set, including flattened field values,
@@ -51,7 +63,7 @@ class OnRiskReport(BaseReport):
             results
         :return:
         """
-        results = self.get_on_risk_report_with_flattened_fields(
+        results = self.get(
             product_name, as_of_timestamp)
 
         write_report_results(results, report_file_path)

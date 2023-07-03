@@ -1,12 +1,14 @@
 import itertools
 import json
 
+from camel_converter import to_snake
+
 
 def entry_belongs_to_group_field(entry):
     return entry['parent_locator'] != ''
 
 
-def get_flattened_fields(prefix: str, collection):
+def get_flattened_fields(prefix: str, collection, style="platform"):
     """
     Returns ordered lists of dicts of flattened fields for a collection
     of aggregated field data
@@ -14,6 +16,8 @@ def get_flattened_fields(prefix: str, collection):
     :param collection: a list of rows of JSON-aggregated field values
     :return: list of lists of flattened values
     """
+
+    prefix = to_snake(prefix) if style == "extract" else prefix
     all_single_count = {}
     all_group_count = {}
 
@@ -85,7 +89,9 @@ def get_flattened_fields(prefix: str, collection):
             if max_count == 1:
                 # if max count is 1, then we know that this can have only one entry
                 # and that the final name needs no number after the name
-                final_field_value_name = f'{prefix} {field_name}'
+                final_field_value_name = f'{prefix}_{to_snake(field_name)}' \
+                                         if style == "extract" \
+                                         else f'{prefix} {field_name}'
                 entry_collection_final_value_map[final_field_value_name] = list(value_pairs)[0][1]
             else:
                 # If max count > 1, we need to cycle over each value, and qualify each one with
@@ -93,7 +99,9 @@ def get_flattened_fields(prefix: str, collection):
                 # for the given aggregation level.
                 sorted_value_pairs = sorted(value_pairs, key=lambda value_pair: value_pair[0])
                 for idx, v in enumerate(sorted_value_pairs):
-                    final_field_value_name = f'{prefix} {field_name} {idx + 1}'
+                    final_field_value_name = f'{prefix}_{to_snake(field_name)}_{idx + 1}' \
+                                             if style == "extract" \
+                                             else f'{prefix} {field_name} {idx + 1}'
                     entry_collection_final_value_map[final_field_value_name] = v[1]
 
         all_single_entry_maps_final_named.append(entry_collection_final_value_map)
@@ -110,7 +118,9 @@ def get_flattened_fields(prefix: str, collection):
                     child_field_name = child_item[0]
                     child_field_values = child_item[1]
                     for idx, child_field_value in enumerate(child_field_values):
-                        final_child_field_name = f'{prefix} {parent_field_name} {child_field_name} {idx + 1}'
+                        final_child_field_name = f'{prefix}_{to_snake(parent_field_name)}_{to_snake(child_field_name)}_{idx + 1}' \
+                                                 if style == "extract" \
+                                                 else f'{prefix} {parent_field_name} {child_field_name} {idx + 1}'
                         entry_collection_final_group_value_map[final_child_field_name] = child_field_value[1]
             else:
                 for parent_idx, parent_field_entry in enumerate(sorted(list(parent_field_entries.items()),
@@ -121,7 +131,9 @@ def get_flattened_fields(prefix: str, collection):
                         child_field_values = child_item[1]
                         for idx, child_field_value in enumerate(child_field_values):
                             final_child_field_name = \
-                                f'{prefix} {parent_field_name} {parent_idx + 1} {child_field_name} {idx + 1}'
+                                f'{prefix}_{to_snake(parent_field_name)}_{parent_idx + 1}_{to_snake(child_field_name)}_{idx + 1}' \
+                                if style == "extract" \
+                                else f'{prefix} {parent_field_name} {parent_idx + 1} {child_field_name} {idx + 1}'
                             entry_collection_final_group_value_map[final_child_field_name] = child_field_value[1]
         all_group_entry_maps_final_named.append(entry_collection_final_group_value_map)
 
@@ -131,7 +143,7 @@ def get_flattened_fields(prefix: str, collection):
     return all_final_results
 
 
-def get_flattened_results(results):
+def get_flattened_results(results, style="platform"):
     """
     Takes row results with JSON in policy_fields, exposure_fields, peril_fields,
     returning the rows augmented with columns representing all flattened values
@@ -148,9 +160,9 @@ def get_flattened_results(results):
         if row.get('peril_fields') is not None:
             all_fields['peril'].append(json.loads(row['peril_fields']))
 
-    flattened_exposure_fields = get_flattened_fields('Exposure', all_fields['exposure'])
-    flattened_policy_fields = get_flattened_fields('Policy', all_fields['policy'])
-    flattened_peril_fields = get_flattened_fields('Peril', all_fields['peril'])
+    flattened_exposure_fields = get_flattened_fields('Exposure', all_fields['exposure'], style)
+    flattened_policy_fields = get_flattened_fields('Policy', all_fields['policy'], style)
+    flattened_peril_fields = get_flattened_fields('Peril', all_fields['peril'], style)
 
     final_results = []
     for result_groups in itertools.zip_longest(

@@ -1,4 +1,4 @@
-from socotra_datamart_reports.lib import queries_platform as queries, get_flattened_fields
+from socotra_datamart_reports.lib import queries_extract as queries, get_flattened_fields
 from socotra_datamart_reports.lib.base_report import\
     BaseReport, write_report_results
 
@@ -15,8 +15,26 @@ class AllPoliciesReport(BaseReport):
 
     def __init__(self, creds):
         super().__init__(creds)
+        self.name = "all_policies"
+        self.argument_specs = [
+            {
+                "name": "product_name",
+                "required": False,
+                "default": False
+            },
+            {
+                "name": "start_timestamp",
+                "required": True,
+                "default": True                
+            },
+            {
+                "name": "end_timestamp",
+                "required": True,
+                "default": True                
+            }
+        ]
 
-    def fetch_all_policies_data(
+    def fetch(
             self, product_name: str, start_timestamp: int, end_timestamp: int):
         """
         Fetches raw all-policies data, with field values aggregated into JSON
@@ -30,7 +48,7 @@ class AllPoliciesReport(BaseReport):
             product_name, start_timestamp, end_timestamp)
         return self.fetch_all_results_for_query(query)
 
-    def get_all_policies_report_with_flattened_fields(
+    def get(
             self, product_name: str, start_timestamp: int, end_timestamp: int):
         """
         Returns result set with field values "flattened", i.e., made into
@@ -42,10 +60,12 @@ class AllPoliciesReport(BaseReport):
         :return:
         """
         return get_flattened_fields.get_flattened_results(
-            self.fetch_all_policies_data(
-                product_name, start_timestamp, end_timestamp))
+            self.fetch(
+                product_name, start_timestamp, end_timestamp),
+                "extract"
+                )
 
-    def write_all_policies_report(
+    def write(
             self, product_name: str, start_timestamp: int,
             end_timestamp: int, report_file_path: str):
         """
@@ -58,6 +78,6 @@ class AllPoliciesReport(BaseReport):
                 results
         :return:
         """
-        results = self.get_all_policies_report_with_flattened_fields(
+        results = self.get(
             product_name, start_timestamp, end_timestamp)
         write_report_results(results, report_file_path)

@@ -1,4 +1,4 @@
-from socotra_datamart_reports.lib import queries, get_flattened_fields
+from socotra_datamart_reports.lib import queries_extract as queries, get_flattened_fields
 from socotra_datamart_reports.lib.base_report import \
     BaseReport, write_report_results
 
