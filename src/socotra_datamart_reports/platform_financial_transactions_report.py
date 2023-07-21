@@ -1,12 +1,12 @@
 from socotra_datamart_reports.lib import queries_platform as queries
-from socotra_datamart_reports.lib.base_report import \
-    BaseReport, write_report_results
+from socotra_datamart_reports.lib.base_report import BaseReport
 
 
 class FinancialTransactionsReport(BaseReport):
     """
     Summarizes financial transactions posted in a given time range
     """
+
     def __init__(self, creds):
         super().__init__(creds)
 
@@ -40,4 +40,4 @@ class FinancialTransactionsReport(BaseReport):
         """
         results = self.get_financial_transactions_report(
             start_timestamp, end_timestamp)
-        write_report_results(results, report_file_path)
+        self.write_report_results(results, report_file_path)

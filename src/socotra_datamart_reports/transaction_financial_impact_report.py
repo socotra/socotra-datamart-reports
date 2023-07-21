@@ -1,6 +1,5 @@
 from socotra_datamart_reports.lib import queries_extract as queries, get_flattened_fields
-from socotra_datamart_reports.lib.base_report import \
-    BaseReport, write_report_results
+from socotra_datamart_reports.lib.base_report import BaseReport
 
 
 class TransactionFinancialImpactReport(BaseReport):
@@ -124,7 +123,7 @@ class TransactionFinancialImpactReport(BaseReport):
                 else:
                     mod_peril_char['premium_delta'] = sum(
                         [v.get('premium') for v in replaced_map_entries]) \
-                                                      - mod_peril_char.get(
+                        - mod_peril_char.get(
                         'replacement_of_premium')
             else:
                 print('unexpected replace count for replaced %s; '
@@ -162,4 +161,4 @@ class TransactionFinancialImpactReport(BaseReport):
         """
         results = self.get_transactions_report_with_flattened_fields(
             product_name, start_timestamp, end_timestamp)
-        write_report_results(results, report_file_path)
+        self.write_report_results(results, report_file_path)

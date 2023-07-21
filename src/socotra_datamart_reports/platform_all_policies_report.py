@@ -1,6 +1,5 @@
 from socotra_datamart_reports.lib import queries_platform as queries, get_flattened_fields
-from socotra_datamart_reports.lib.base_report import\
-    BaseReport, write_report_results
+from socotra_datamart_reports.lib.base_report import BaseReport
 
 
 class AllPoliciesReport(BaseReport):
@@ -15,6 +14,7 @@ class AllPoliciesReport(BaseReport):
 
     def __init__(self, creds):
         super().__init__(creds)
+        self.name = "all_policies"
 
     def fetch_all_policies_data(
             self, product_name: str, start_timestamp: int, end_timestamp: int):
@@ -60,4 +60,4 @@ class AllPoliciesReport(BaseReport):
         """
         results = self.get_all_policies_report_with_flattened_fields(
             product_name, start_timestamp, end_timestamp)
-        write_report_results(results, report_file_path)
+        self.write_report_results(results, report_file_path)
