@@ -43,7 +43,7 @@ def get_on_risk_query(product_name: str, as_of_timestamp: int):
 def get_all_policies_query(product_name: str, start_timestamp: int, end_timestamp: int):
     return f"""
         SELECT policy.product_name AS product_name,
-           policy.locator AS policy_id,
+           policy.locator AS policy_locator,
            policy.payment_schedule_name AS payment_schedule_name,
            exposure.locator AS exposure_locator,
            exposure.name AS exposure_name,

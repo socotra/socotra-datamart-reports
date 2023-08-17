@@ -1,6 +1,5 @@
-from socotra_datamart_reports.lib import queries, get_flattened_fields
-from socotra_datamart_reports.lib.base_report import \
-    BaseReport, write_report_results
+from socotra_datamart_reports.lib import queries_platform as queries, get_flattened_fields
+from socotra_datamart_reports.lib.base_report import BaseReport
 
 
 class OnRiskReport(BaseReport):
@@ -54,4 +53,4 @@ class OnRiskReport(BaseReport):
         results = self.get_on_risk_report_with_flattened_fields(
             product_name, as_of_timestamp)
 
-        write_report_results(results, report_file_path)
+        self.write_report_results(results, report_file_path)
