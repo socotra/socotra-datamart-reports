@@ -3,18 +3,12 @@ from socotra_datamart_reports.lib.base_report import BaseReport
 import pandas as pd
 
 
-class AllTransactionsReport(BaseReport):
+class ClaimsCreatedReport(BaseReport):
     """
-    Fetches all-policies results from Data Mart, with ability to write a
-    report with "flattened" fields. "Flattened" fields are denormalized; since
-    each row of the report corresponds to a single peril characteristic,
-    we show relevant fields by putting each one in its own labeled column,
-    for all three levels (Policy, Exposure, Peril). Repeated fields or
-    field groups receive numerical qualifiers.
+    Fetches all claims and associates fields
     """
-    name = "billing"
     visible = True
-
+    name = "claims_created"
     argument_specs = [
         {
             "name": "product_name",
@@ -25,37 +19,25 @@ class AllTransactionsReport(BaseReport):
             "name": "start_timestamp",
             "required": True,
             "default": True
-        },
-        {
-            "name": "end_timestamp",
-            "required": True,
-            "default": True
         }
     ]
     record_specs = [
         {
-            "name": "period_start",
+            "name": "claim_locator",
+            "type": "string",
+            "index": True
+        },
+        {
+            "name": "policy_locator",
+            "type": "string"
+        },
+        {
+            "name": "created",
             "type": "datetime"
         },
         {
-            "name": "period_end",
-            "type": "datetime"
-        },
-        {
-            "name": "period_due",
-            "type": "datetime"
-        },
-        {
-            "name": "issued",
-            "type": "datetime"
-        },
-        {
-            "name": "invoice_amount",
-            "type": "float"
-        },
-        {
-            "name": "paid_amount",
-            "type": "float"
+            "name": "product_name",
+            "type": "string"
         }
     ]
 
@@ -73,11 +55,13 @@ class AllTransactionsReport(BaseReport):
 
     def prepare(self):
         self.arguments["start_timestamp"] = int(
-            self.arguments["start_timestamp"])
-        self.arguments["end_timestamp"] = int(self.arguments["end_timestamp"])
-        self.arguments["product_statement"] = f' '
-        if self.arguments["product_name"] != False:
-            self.arguments["product_statement"] = f'policy.product_name = "{self.arguments["product_name"]}" AND '
+            self.arguments["start_timestamp"]
+        )
+        self.arguments["product_statement"] = ''
+        if self.arguments["product_name"] is not False:
+            self.arguments[
+                "product_statement"
+            ] = f'AND claim.product_name = "{self.arguments["product_name"]}"'
 
     def fetch(self):
         import pathlib

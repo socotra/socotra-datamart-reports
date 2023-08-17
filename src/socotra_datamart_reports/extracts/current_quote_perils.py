@@ -3,9 +3,9 @@ from socotra_datamart_reports.lib.base_report import BaseReport
 import pandas as pd
 
 
-class AllTransactionsReport(BaseReport):
+class CurrentQuotePerils(BaseReport):
     """
-    Fetches all-policies results from Data Mart, with ability to write a
+    Fetches all-quotes results from Data Mart, with ability to write a
     report with "flattened" fields. "Flattened" fields are denormalized; since
     each row of the report corresponds to a single peril characteristic,
     we show relevant fields by putting each one in its own labeled column,
@@ -13,43 +13,49 @@ class AllTransactionsReport(BaseReport):
     field groups receive numerical qualifiers.
     """
     visible = True
+    name = "current_quote_perils"
 
-    def __init__(self, creds):
-        super().__init__(creds)
-        self.name = "all_transactions"
+    argument_specs = [
+        {
+            "name": "product_name",
+            "required": False,
+            "default": False
+        },
+        {
+            "name": "start_timestamp",
+            "required": True,
+            "default": True
+        },
+        {
+            "name": "end_timestamp",
+            "required": True,
+            "default": True
+        }
+    ]
+    record_specs = [
+        {
+            "name": "quote_locator",
+            "type": "string",
+            "index": True
+        },
+        {
+            "name": "coverage_start",
+            "type": "datetime"
+        },
+        {
+            "name": "coverage_end",
+            "type": "datetime"
+        },
+        {
+            "name": "premium",
+            "type": "float"
+        },
+    ]
+
+    def __init__(self, creds, arguments):
+        super().__init__(creds, self.name, arguments)
         self.data = []
         self.records = []
-        self.argument_specs = [
-            {
-                "name": "product_name",
-                "required": False,
-                "default": False
-            },
-            {
-                "name": "start_timestamp",
-                "required": True,
-                "default": True
-            },
-            {
-                "name": "end_timestamp",
-                "required": True,
-                "default": True
-            }
-        ]
-        self.record_specs = [
-            {
-                "name": "coverage_start",
-                "type": "datetime"
-            },
-            {
-                "name": "coverage_end",
-                "type": "datetime"
-            },
-            {
-                "name": "premium",
-                "type": "float"
-            },
-        ]
 
         self.column_settings = [
             # Not all columns require settings
@@ -80,8 +86,5 @@ class AllTransactionsReport(BaseReport):
             "extract"
         )
         self.records = pd.DataFrame(results)
+        self.massage_to_spec()
         return self.records
-
-    def write(self):
-        self.write_report_records(
-            self.arguments["report_file_path"], fields_to_omit=[])

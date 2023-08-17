@@ -9,7 +9,6 @@ def find_submodules(local, filter_hidden):
 
     submodules = []
     current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-    base_directory = os.path.basename(current_dir)[0]
     current_module_name = ".".join([
         os.path.splitext(
             os.path.basename(current_dir)
@@ -43,22 +42,23 @@ class ReportEngine:
     def report_list(self, filter_hidden=True):
         return find_submodules("extracts", filter_hidden)
 
-    def run(self, report):
-        report_instance = report(self.creds)
+    def run(self, report, format=['parquet', 'csv']):
+        report_instance = report(self.creds, self.arguments)
         print(f"Processing: {report_instance.name}")
-        report_arguments = OrderedDict()
-        for spec in report_instance.argument_specs:
-            if spec["name"] in self.arguments:
-                report_arguments[spec["name"]] = self.arguments[spec["name"]]
-            elif "default" in spec:
-                report_arguments[spec["name"]] = spec["default"]
-            else:
-                print(
-                    f'Required parameter \"{spec["name"]}\" for report \"{self["name"]}\" is not found')
+        # report_arguments = OrderedDict()
+        # for spec in report_instance.argument_specs:
+        #     if spec["name"] in self.arguments:
+        #         report_arguments[spec["name"]] = self.arguments[spec["name"]]
+        #     elif "default" in spec:
+        #         report_arguments[spec["name"]] = spec["default"]
+        #     else:
+        #         print(
+        #             f'Required parameter \"{spec["name"]}\" for report \"{self["name"]}\" is not found')
 
-        report_arguments["report_file_path"] = f'{self.base_directory}/{report_instance.name}.parq'
-        report_instance.arguments = report_arguments
-        report_instance.prepare()
+        # report_arguments["report_path"] = self.base_directory
+        # report_arguments["report_filename"] = report_instance.name
+        # report_instance.arguments = report_arguments
         report_instance.fetch()
         report_instance.build()
-        report_instance.write()
+        report_instance.write(format=format)
+        report_instance.close()

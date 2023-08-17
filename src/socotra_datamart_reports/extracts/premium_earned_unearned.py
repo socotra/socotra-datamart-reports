@@ -3,7 +3,7 @@ from socotra_datamart_reports.lib.base_report import BaseReport
 import pandas as pd
 
 
-class AllQuotesReport(BaseReport):
+class PremiumEarnedUnearned(BaseReport):
     """
     Fetches all-policies results from Data Mart, with ability to write a
     report with "flattened" fields. "Flattened" fields are denormalized; since
@@ -12,11 +12,11 @@ class AllQuotesReport(BaseReport):
     for all three levels (Policy, Exposure, Peril). Repeated fields or
     field groups receive numerical qualifiers.
     """
-    visible = True
+    visible = False
+    prerequisites = ["all_transactions"]
 
     def __init__(self, creds):
-        super().__init__(creds)
-        self.name = "all_quotes"
+        super().__init__(creds, "premium_earned_unearned")
         self.data = []
         self.records = []
         self.argument_specs = [
@@ -38,6 +38,11 @@ class AllQuotesReport(BaseReport):
         ]
         self.record_specs = [
             {
+                "name": "peril_characteristics_locator",
+                "type": "string",
+                "index": True
+            },
+            {
                 "name": "coverage_start",
                 "type": "datetime"
             },
@@ -46,9 +51,13 @@ class AllQuotesReport(BaseReport):
                 "type": "datetime"
             },
             {
+                "name": "issued",
+                "type": "datetime"
+            },
+            {
                 "name": "premium",
                 "type": "float"
-            },
+            }
         ]
 
         self.column_settings = [
@@ -80,7 +89,5 @@ class AllQuotesReport(BaseReport):
             "extract"
         )
         self.records = pd.DataFrame(results)
+        self.massage_to_spec()
         return self.records
-
-    def write(self):
-        self.write_report_records(self.arguments["report_file_path"])

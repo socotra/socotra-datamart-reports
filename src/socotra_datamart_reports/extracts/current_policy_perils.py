@@ -3,7 +3,7 @@ from socotra_datamart_reports.lib.base_report import BaseReport
 import pandas as pd
 
 
-class AllTransactionsReport(BaseReport):
+class CurrentPolicyPerils(BaseReport):
     """
     Fetches all-policies results from Data Mart, with ability to write a
     report with "flattened" fields. "Flattened" fields are denormalized; since
@@ -12,9 +12,8 @@ class AllTransactionsReport(BaseReport):
     for all three levels (Policy, Exposure, Peril). Repeated fields or
     field groups receive numerical qualifiers.
     """
-    name = "billing"
     visible = True
-
+    name = "current_policy_perils"
     argument_specs = [
         {
             "name": "product_name",
@@ -34,15 +33,16 @@ class AllTransactionsReport(BaseReport):
     ]
     record_specs = [
         {
-            "name": "period_start",
+            "name": "policy_locator",
+            "type": "string",
+            "index": True
+        },
+        {
+            "name": "coverage_start",
             "type": "datetime"
         },
         {
-            "name": "period_end",
-            "type": "datetime"
-        },
-        {
-            "name": "period_due",
+            "name": "coverage_end",
             "type": "datetime"
         },
         {
@@ -50,11 +50,7 @@ class AllTransactionsReport(BaseReport):
             "type": "datetime"
         },
         {
-            "name": "invoice_amount",
-            "type": "float"
-        },
-        {
-            "name": "paid_amount",
+            "name": "written_premium",
             "type": "float"
         }
     ]

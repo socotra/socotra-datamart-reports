@@ -29,6 +29,8 @@ def report_range(startDate, endDate):
     ]
 
 
+# Define standard params needed for reports
+
 creds = {
     'host': os.getenv('DATAMART_HOST'),
     'port': os.getenv('DATAMART_PORT'),
@@ -42,16 +44,15 @@ creds = {
     "01/01/2023", "06/29/2023"
 )
 
-# report_list = inspect.getmembers(reports, inspect.isclass)
+# Implement UI Code Here
 
-# app = AppUI()
-# frame = PrimaryWindow(app, report_list)
-# app.mainloop()
+# Implement Report Runner Code Here
 
 report_params = {
     "start_timestamp": report_start_timestamp,
     "end_timestamp": report_end_timestamp,
-    "as_of_timestamp": report_start_timestamp
+    "as_of_timestamp": report_start_timestamp,
+    "report_path": "data"
 }
 report_core = reports.Engine(creds, report_params, "data")
 report_list = report_core.report_list()
